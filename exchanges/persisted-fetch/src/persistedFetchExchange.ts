@@ -51,6 +51,7 @@ export const persistedFetchExchange: Exchange = ({
         const body = makeFetchBody(operation);
         if (!supportsPersistedQueries) {
           // Runs the usual non-persisted fetchExchange query logic
+          operation.context.preferGetMethod = false;
           return pipe(
             makePersistedFetchSource(operation, body, dispatchDebug),
             takeUntil(teardown$)
@@ -85,6 +86,8 @@ export const persistedFetchExchange: Exchange = ({
             } else if (result.error && isPersistedMiss(result.error)) {
               // Add query to the body but leave SHA256 hash intact
               body.query = query;
+              // Turn off GET
+              operation.context.preferGetMethod = false;
               return makePersistedFetchSource(operation, body, dispatchDebug);
             }
 
